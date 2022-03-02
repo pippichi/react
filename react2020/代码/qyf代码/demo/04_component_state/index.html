@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>04_component_state</title>
+</head>
+<body>
+<div id="test"></div>
+
+<script type="text/javascript" src="../js/react.development.js"></script>
+<script type="text/javascript" src="../js/react-dom.development.js"></script>
+<script type="text/javascript" src="../js/babel.min.js"></script>
+<script type="text/babel">
+    /*
+    * 需求：自定义组件，功能说明如下：
+    *   1、显示h2标题，初始文本为：你喜欢我
+    *   2、点击标题更新为：我喜欢你
+    * */
+    // 1、定义组件
+    class Like extends React.Component{
+        constructor(props){
+            super(props)
+            this.state = {
+                isLikeMe: false
+            }
+
+            // 将新增方法中的this强制绑定为组件对象
+            this.handleClick = this.handleClick.bind(this)
+            this.setState = this.setState.bind(this)
+        }
+
+        setState(obj) {
+            this.state = obj
+        }
+
+        // 新添加的方法：内部的this默认不是组件对象，而是undefined
+        handleClick(){
+            const isLikeMe = !this.state.isLikeMe
+            this.setState({isLikeMe})
+        }
+
+        // 重写组件类的方法
+        render(){
+            console.log(this)
+            // 读取状态
+            const {isLikeMe} = this.state
+            console.log(isLikeMe)
+            return <h2 onClick={this.handleClick}>{isLikeMe? "你喜欢我" : "我喜欢你"}</h2>
+        }
+    }
+    // 2、渲染组件标签
+    ReactDOM.render(<Like/>, document.querySelector("#test"))
+</script>
+</body>
+</html>

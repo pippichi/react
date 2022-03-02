@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>09_component_lifecycle</title>
+</head>
+<body>
+<div id="test"></div>
+<div id="test2"></div>
+<script type="text/javascript" src="../js/babel.min.js"></script>
+<script type="text/javascript" src="../js/react.development.js"></script>
+<script type="text/javascript" src="../js/prop-types.js"></script>
+<script type="text/javascript" src="../js/react-dom.development.js"></script>
+<script type="text/babel">
+  /*
+  * 需求：自定义组件
+  *   1.让指定的文本做显示/隐藏的动画
+  *   2.切换时间为2S
+  *   3.点击按钮从界面中移除组件界面
+  * */
+  class Life extends React.Component{
+
+    constructor(props){
+      super(props)
+      // 初始化状态
+      this.state = {
+        opacity: 1
+      }
+      this.destroyComponent = this.destroyComponent.bind(this)
+    }
+
+    destroyComponent(){
+      ReactDOM.unmountComponentAtNode(document.querySelector("#test"))
+    }
+
+    componentWillMount(){
+      console.log("componentWillMount()")
+    }
+
+    componentDidMount(){
+      // 启动循环定时器
+      this.intervalId = setInterval(function(){
+        let {opacity} = this.state
+        opacity -= 0.1
+        if(opacity <= Number.EPSILON) {
+          opacity = 1
+        }
+        this.setState({opacity})
+      }.bind(this), 200)
+    }
+
+    componentWillUpdate(){
+      console.log("componentWillUpdate()")
+    }
+
+    componentDidUpdate(){
+      console.log("componentDidUpdate()")
+    }
+
+    // 这里有一个内存泄漏的问题，当我们执行destroyComponent的时候对应id的div确实被删掉了，
+    // 但是我们会发现定时器还在跑，这里有两个方法去消除定时器，一种是执行destroyComponent
+    // 的时候顺便销毁定时器，一种就是在组件生命周期销毁时期销毁定时器
+    componentWillUnmount(){
+      // 清除定时器
+      clearInterval(this.intervalId)
+    }
+
+
+    render(){
+      const {opacity} = this.state
+      return (
+        <div>
+          <h2 style={{opacity}}>{this.props.msg}</h2>
+          <button onClick={this.destroyComponent}>不活了</button>
+        </div>
+      )
+    }
+  }
+  ReactDOM.render(<Life msg="react太难了！"/>, document.querySelector("#test"))
+</script>
+</body>
+</html>

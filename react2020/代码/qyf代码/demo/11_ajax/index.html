@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>11_ajax</title>
+</head>
+<body>
+<div id="test"></div>
+<script type="text/javascript" src="../js/prop-types.js"></script>
+<script type="text/javascript" src="../js/react.development.js"></script>
+<script type="text/javascript" src="../js/react-dom.development.js"></script>
+<script type="text/javascript" src="../js/babel.min.js"></script>
+<script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.0/axios.js"></script>
+<script type="text/babel">
+  /*
+  * 需求：
+  *   1.根据指定的关键字在GitHub上搜索匹配的最受关注的库
+  *   2.显示库名，点击链接查看库
+  *   3.测试接口： https://api.github.com/search/repositories?q=r&sort=stars
+  * */
+  class MostStartRepo extends React.Component {
+    state = {
+      repoName: '',
+      repoUrl: ''
+    }
+
+    componentDidMount() {
+      // 发送异步axios请求
+      const url = 'https://api.github.com/search/repositories?q=r&sort=stars'
+      axios.get(url)
+      .then(rsp => {
+        const result = rsp.data
+        // 得到数据
+        const {name, html_url} = result.item[0]
+        // 更新状态
+        this.setState({repoName: name, repoUrl: html_url})
+      })
+      .catch(e => {
+        alert(e.message)
+      })
+      // 发送异步fetch请求
+      // fetch(url)
+      // .then(response => {
+      //   return response.json()
+      // }).then(data => {
+      //   // 得到数据
+      //   const {name, html_url} = data
+      //   // 更新状态
+      //   this.setState({repoName: name, repoUrl: html_url})
+      // })
+    }
+
+    render() {
+      const {repoName, repoUrl} = this.state
+      if(!repoName){
+        return <h2>LOADING...</h2>
+      }else{
+        return <h2>Most start repo is <a href={repoUrl}>{repoName}</a></h2>
+      }
+    }
+  }
+
+  ReactDOM.render(<MostStartRepo/>, document.querySelector("#test"))
+</script>
+
+</body>
+</html>
